@@ -1,0 +1,12 @@
+{
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Miles Smith",
+  "development_status": "Development Status :: 3 - Alpha",
+  "email": "miles-smith@omrf.org",
+  "friendly_name": "Hashwalk",
+  "github_user": "milescsmith",
+  "license": "MIT",
+  "package_name": "hashwalk",
+  "project_name": "hashwalk",
+  "version": "0.1.0"
+}
