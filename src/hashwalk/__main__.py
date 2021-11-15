@@ -16,7 +16,7 @@ def version_callback(value: bool) -> None:
     """Prints the version of the package."""
     if value:
         console.print(
-            f"[yellow]{__name__}[/] version: [bold blue]{version(__name__)}[/]"
+            f"[yellow]{__package__}[/] version: [bold blue]{version(__package__)}[/]"
         )
         raise typer.Exit()
 
@@ -63,6 +63,7 @@ def main(
 ) -> None:
     """Hashwalk."""
 
+
     pattern = str(pattern)
 
     if path.is_dir():
@@ -89,10 +90,8 @@ def main(
             hashes = {str(path.name): md5(path.open("rb").read()).hexdigest()}
 
     if write_individual_files:
-        (
+        for i in hashes:
             Path(i).with_suffix(Path(i).suffix + ".md5").write_text(hashes[i])
-            for i in hashes
-        )
 
     if output_table is not None:
         pd.DataFrame.from_dict(data=hashes, orient="index").to_csv(
