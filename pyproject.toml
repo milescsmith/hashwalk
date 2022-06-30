@@ -46,7 +46,7 @@ sphinx-rtd-theme = "^1.0.0"
 sphinx-click = "^3.0.2"
 Pygments = "^2.10.0"
 nox = "^2021.10.1"
-nox-poetry = "^0.8.6"
+nox-poetry = "^1.0.1"
 isort = "^5.10.1"
 
 [tool.poetry.scripts]
