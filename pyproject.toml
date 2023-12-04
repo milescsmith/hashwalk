@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hashwalk"
-version = "0.2.0"
+version = "0.3.0"
 description = "Hashwalk"
 authors = ["Miles Smith <miles-smith@omrf.org>"]
 license = "MIT"
@@ -16,38 +16,29 @@ classifiers = [
 Changelog = "https://github.com/milescsmith/hashwalk/releases"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-click = "^8.0.1"
-typer = {extras = ["all"], version = "^0.4.0"}
-pandas = "^1.3.4"
-rich = "^10.13.0"
+python = ">=3.10,<4.0"
+typer = {extras = ["all"], version = ">=0.9.0"}
+pandas = ">=2.1"
+rich = ">=10"
+icontract = "^2.6.6"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"
 coverage = {extras = ["toml"], version = "^6.1"}
-safety = "^1.10.3"
 mypy = "^0.910"
 typeguard = "^2.13.0"
 xdoctest = {extras = ["colors"], version = "^0.15.10"}
 sphinx = "^4.2.0"
 sphinx-autobuild = "^2021.3.14"
 pre-commit = "^2.15.0"
-flake8 = "^4.0.1"
-black = "^21.10b0"
-flake8-bandit = "^2.1.2"
-flake8-bugbear = "^21.9.2"
-flake8-docstrings = "^1.6.0"
-flake8-rst-docstrings = "^0.2.3"
-pep8-naming = "^0.12.1"
-darglint = "^1.8.1"
-reorder-python-imports = "^2.6.0"
+black = ">=21"
 pre-commit-hooks = "^4.0.1"
 sphinx-rtd-theme = "^1.0.0"
 sphinx-click = "^3.0.2"
 Pygments = "^2.10.0"
 nox = "^2021.10.1"
 nox-poetry = "^0.8.6"
-isort = "^5.10.1"
+ruff = ">=0.0.274"
 
 [tool.poetry.scripts]
 hashwalk = "hashwalk.__main__:app"
@@ -64,6 +55,7 @@ show_missing = true
 fail_under = 100
 
 [tool.mypy]
+python_version = "3.10"
 strict = true
 warn_unreachable = true
 pretty = true
@@ -74,3 +66,84 @@ show_error_context = true
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+select = [
+    "A",
+    "ARG",
+    "B",
+    "C",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FBT",
+    "I",
+    "I001",
+    "ICN",
+    "ISC",
+    "N",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "Q",
+    "RUF",
+    "S",
+    "T",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+]
+ignore = [
+    "B027",
+    "FBT003",
+    "FBT002",
+    "FBT001",
+    "S105",
+    "S106",
+    "S107",
+    "C901",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "UP007"
+]
+unfixable = ["F401"]
+exclude = [
+    ".git",
+    ".hg",
+    "__pycache__",
+    "_bin/*",
+    "_build/*",
+    "_ig_fbcode_wheel/*",
+    "buck-out/*",
+    "third-party-buck/*",
+    "third-party2/*",
+    "dist",
+    ".venv",
+    ".nox",
+    ".mypy_cache",
+    ".pytype",
+    ".svn",
+    "__pypackages__",
+]
+src = ["src"]
+
+[tool.ruff.mccabe]
+max-complexity = 50
+
+[tool.ruff.isort]
+known-first-party = ["readcounts"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
