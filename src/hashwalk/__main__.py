@@ -23,7 +23,7 @@ def version_callback(value: bool) -> None:
 
 # ALGOS = list(hashlib.algorithms_available)
 @app.command(no_args_is_help=True)
-@require(lambda algorithm: algorithm in hashlib.algorithms_available)
+# @require(lambda algorithm: algorithm in hashlib.algorithms_available)
 def main(
     path: Annotated[
         Optional[Path],
@@ -69,7 +69,6 @@ def main(
     version: Annotated[  # noqa: ARG001
         Optional[bool],
         typer.Option(
-            None,
             "-v",
             "--version",
             callback=version_callback,
