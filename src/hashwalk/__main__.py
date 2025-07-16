@@ -1,13 +1,15 @@
 """Command-line interface."""
+
 import hashlib
 from importlib.metadata import version
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import pandas as pd
 import typer
 from icontract import require
 from rich.console import Console
+from tqdm.auto import tqdm
 
 app = typer.Typer(name="hashwalk", help="Generate a hash has for all files along a path.", no_args_is_help=True)
 
@@ -23,10 +25,10 @@ def version_callback(value: bool) -> None:
 
 # ALGOS = list(hashlib.algorithms_available)
 @app.command(no_args_is_help=True)
-# @require(lambda algorithm: algorithm in hashlib.algorithms_available)
+@require(lambda algorithm: algorithm in hashlib.algorithms_available)
 def main(
     path: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Argument(
             exists=True,
             file_okay=True,
@@ -56,7 +58,7 @@ def main(
         bool, typer.Option("-i", "--individual", help="Write an MD5 file for each hash calculated")
     ] = False,
     output_table: Annotated[
-        Optional[Path], typer.Option("-o", "--output", help="Write hashes to table with this filename")
+        Path | None, typer.Option("-o", "--output", help="Write hashes to table with this filename")
     ] = None,
     full_path_name: Annotated[
         bool,
@@ -66,8 +68,8 @@ def main(
             help="Display the fully resolved file name with path or just the file name",
         ),
     ] = False,
-    version: Annotated[  # noqa: ARG001
-        Optional[bool],
+    version: Annotated[
+        bool | None,
         typer.Option(
             "-v",
             "--version",
@@ -89,7 +91,7 @@ def main(
 
         hashes = {
             str(_.resolve()) if full_path_name else str(_.name): make_hash(_, algorithm)
-            for _ in filelist
+            for _ in tqdm(filelist)
             if _.is_file()
         }
     else:
