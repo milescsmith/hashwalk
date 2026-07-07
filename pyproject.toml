@@ -1,14 +1,15 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.7.0,<0.13.0"]
+build-backend = "uv_build"
+
 
 [project]
 name = "hashwalk"
-version = "0.4.1"
+version = "0.4.2"
 description = "Hashwalk"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 authors = [
-    {name = "Miles Smith", email = "miles-smith@omrf.org"}
+    { name = "Miles Smith", email = "miles-smith@omrf.org" }
 ]
 license = "MIT"
 readme = "README.rst"
@@ -16,9 +17,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
 ]
 dependencies = [
-    "icontract>=2.7.1",
     "rich>=14.0.0",
-    "tqdm>=4.68.4",
     "typer>=0.16.0",
 ]
 

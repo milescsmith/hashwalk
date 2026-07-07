@@ -1,19 +1,37 @@
 """Command-line interface."""
 
 import hashlib
+from enum import StrEnum
 from importlib.metadata import version
 from pathlib import Path
 from typing import Annotated
 
-import pandas as pd
 import typer
-from icontract import require
 from rich.console import Console
-from tqdm.auto import tqdm
+from rich.progress import track
 
 app = typer.Typer(name="hashwalk", help="Generate a hash has for all files along a path.", no_args_is_help=True)
 
 console = Console()
+
+
+class HashAlgorithm(StrEnum):
+    """Hash algorithms available in hashlib."""
+
+    MD5 = "md5"
+    SHA1 = "sha1"
+    SHA224 = "sha224"
+    SHA256 = "sha256"
+    SHA384 = "sha384"
+    SHA512 = "sha512"
+    BLAKE2B = "blake2b"
+    SHAKE_256 = "shake_256"
+    BLAKE2S = "blake2s"
+    SHA3_384 = "sha3_384"
+    SHA_224 = "sha3_224"
+    SHA3_256 = "sha3_256"
+    SHA3_512 = "sha3_512"
+    SHAKE_128 = "shake_128"
 
 
 def version_callback(value: bool) -> None:
@@ -25,7 +43,6 @@ def version_callback(value: bool) -> None:
 
 # ALGOS = list(hashlib.algorithms_available)
 @app.command(no_args_is_help=True)
-@require(lambda algorithm: algorithm in hashlib.algorithms_available)
 def main(
     path: Annotated[
         Path | None,
@@ -46,13 +63,13 @@ def main(
         ),
     ] = "*",
     algorithm: Annotated[
-        str,
+        HashAlgorithm,
         typer.Option(
             "-a",
             "--algorithm",
             help="Algorithm to use when generating the hash",
         ),
-    ] = "md5",
+    ] = HashAlgorithm.MD5,
     recursive: Annotated[bool, typer.Option("-r", "--recursive", help="Search for files recursively")] = False,
     write_individual_files: Annotated[
         bool, typer.Option("-i", "--individual", help="Write an MD5 file for each hash calculated")
@@ -91,7 +108,7 @@ def main(
 
         hashes = {
             str(_.resolve()) if full_path_name else str(_.name): make_hash(_, algorithm)
-            for _ in tqdm(filelist)
+            for _ in track(filelist, description="Calculating hashes...")
             if _.is_file()
         }
     else:
