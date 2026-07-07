@@ -102,7 +102,10 @@ def main(
             Path(i).with_suffix(f"{Path(i).suffix}.{algorithm}").write_text(hashes[i])
 
     if output_table is not None:
-        pd.DataFrame.from_dict(data=hashes, orient="index").to_csv(path_or_buf=output_table)
+        with open(output_table, "w", encoding="utf-8") as f:
+            f.write(f"filename,{algorithm}\n")
+            for key, value in hashes.items():
+                f.write(f"{key},{value}\n")
 
     if (output_table is None) and (write_individual_files is False):
         for k in hashes:

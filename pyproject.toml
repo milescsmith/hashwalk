@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hashwalk"
-version = "0.4.0"
+version = "0.4.1"
 description = "Hashwalk"
 requires-python = ">=3.10"
 authors = [
@@ -17,8 +17,8 @@ classifiers = [
 ]
 dependencies = [
     "icontract>=2.7.1",
-    "pandas>=2.3.1",
     "rich>=14.0.0",
+    "tqdm>=4.68.4",
     "typer>=0.16.0",
 ]
 
