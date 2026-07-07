@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+from joblib import Parallel, delayed
 from rich.console import Console
 from rich.progress import track
 
@@ -37,7 +38,10 @@ class HashAlgorithm(StrEnum):
 def version_callback(value: bool) -> None:
     """Prints the version of the package."""
     if value:
-        console.print(f"[yellow]{__package__}[/] version: [bold blue]{version(__package__)}[/]")
+        if __package__ is None:
+            console.print("[yellow]hashwalk[/] version: [bold blue]unknown[/]")
+        else:
+            console.print(f"[yellow]{__package__}[/] version: [bold blue]{version(__package__)}[/]")
         raise typer.Exit()
 
 
@@ -85,6 +89,14 @@ def main(
             help="Display the fully resolved file name with path or just the file name",
         ),
     ] = False,
+    n_cpu: Annotated[
+        int,
+        typer.Option(
+            "-n",
+            "--n-cpu",
+            help="Number of CPUs to use when calculating hashes. Default is all available CPUs.",
+        ),
+    ] = -1,
     version: Annotated[
         bool | None,
         typer.Option(
@@ -101,16 +113,13 @@ def main(
     path = Path().cwd() if path is None else path
     pattern = str(pattern)
 
-    if path.is_dir():
-        if recursive:
-            pattern = f"**/{pattern}"
-        filelist = path.glob(pattern)
+    parallel = Parallel(n_jobs=n_cpu, backend="loky", prefer="threads", verbose=0, timeout=None, pre_dispatch="2*n_jobs", batch_size="auto")
 
-        hashes = {
-            str(_.resolve()) if full_path_name else str(_.name): make_hash(_, algorithm)
-            for _ in track(filelist, description="Calculating hashes...")
-            if _.is_file()
-        }
+    if path.is_dir():
+        filelist = path.rglob(pattern) if recursive else path.glob(pattern)
+        actual_files_list = {f for f in filelist if f.is_file()}
+        hashes = parallel(delayed(make_hash)(_, algorithm) for _ in track(actual_files_list, description="Calculating hashes...") if _.is_file())
+        hashes = {str(path.resolve()) if full_path_name else str(path.name): _hash for path, _hash in zip(actual_files_list, hashes, strict=True)}
     else:
         hashes = {str(path.resolve()) if full_path_name else str(path.name): make_hash(path, algorithm)}
 
@@ -120,9 +129,9 @@ def main(
 
     if output_table is not None:
         with open(output_table, "w", encoding="utf-8") as f:
-            f.write(f"filename,{algorithm}\n")
+            f.write(f"path,filename,{algorithm}\n")
             for key, value in hashes.items():
-                f.write(f"{key},{value}\n")
+                f.write(f"{Path(key).parent},{Path(key).name},{value}\n")
 
     if (output_table is None) and (write_individual_files is False):
         for k in hashes:
